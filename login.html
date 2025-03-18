@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickNPack - Online Grocery Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            text-decoration: none;
+            margin: 0 15px;
+            color: black;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            color: green;
+        }
+        .main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+        }
+        .main-text {
+            max-width: 50%;
+        }
+        .main-text h1 {
+            font-size: 40px;
+            color: green;
+        }
+        .main-text p {
+            color: gray;
+        }
+        .cta {
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .cta:hover {
+            background-color: darkgreen;
+        }
+        .footer {
+            position: absolute;
+            bottom: 5px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div><strong>PickNPack</strong></div>
+        <div>
+            <a href="#about">About</a>
+            <a href="#career">Career</a>
+            <a href="#contact">Contact</a>
+            <a href="login.html" style="color: green;">Login</a>
+            <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="main-text">
+            <h1>Online <br> GROCERY STORE</h1>
+            <p>Your one-stop solution for fresh groceries delivered to your doorstep.</p>
+            <button class="cta">SHOP NOW</button>
+        </div>
+        <div>
+            <img src="loginimage.png" alt="Grocery Store" width="400">
+        </div>
+    </div>
+    <div class="footer">
+        <p>Made by Kusharga Agarwal</p>
+    </div>
+</body>
+</html>
