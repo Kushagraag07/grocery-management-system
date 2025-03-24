@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | PickNPack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        .product {
+            display: inline-block;
+            width: 30%;
+            margin: 15px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            background: white;
+        }
+        .product img {
+            width: 150px;
+            height: 150px;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px;
+            background: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Available Products</h1>
+        <div id="product-list"></div>
+    </div>
+
+    <script>
+        fetch("fetch_products.php")
+            .then(response => product.json())
+            .then(data => {
+                let productList = document.getElementById("product-list");
+                data.forEach(product => {
+                    productList.innerHTML += `
+                        <div class="product">
+                            <img src="${product.image_url}" alt="${product.name}">
+                            <h2>${product.name}</h2>
+                            <p>Price: $${product.price}</p>
+                            <button onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>`;
+                });
+            });
+        </script>
+    <script>
+        function addToCart(productId) {
+            fetch("add_to_cart.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `product_id=${productId}`
+            }).then(response => product.json())
+              .then(data => alert(data.message));
+        }
+        </script>
+          
+
+</body>
+</html>

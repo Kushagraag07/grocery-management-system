@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | PickNPack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            text-decoration: none;
+            margin: 0 15px;
+            color: black;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            color: green;
+        }
+        .container {
+            text-align: center;
+            padding: 50px;
+        }
+        .dashboard-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .button {
+            padding: 15px 25px;
+            background-color: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .button:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <strong>PickNPack</strong>
+        <div>
+            <a href="products.html">Products</a>
+            <a href="cart.html">Cart</a>
+            <a href="orders.html">Orders</a>
+            <a href="login.html" style="color: green;">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Welcome to Your Dashboard</h1>
+        <p>Manage your shopping experience efficiently.</p>
+        <div class="dashboard-buttons">
+            <a href="products.html" class="button">Browse Products</a>
+            <a href="cart.html" class="button">View Cart</a>
+            <a href="orders.html" class="button">Order History</a>
+        </div>
+    </div>
+
+</body>
+</html>

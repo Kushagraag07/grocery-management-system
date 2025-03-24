@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickNPack - Your Grocery Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            text-decoration: none;
+            margin: 0 15px;
+            color: black;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            color: green;
+        }
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+            background-color: #fff;
+        }
+        .hero-text {
+            max-width: 50%;
+            text-align: left;
+        }
+        .hero-text h1 {
+            font-size: 40px;
+            color: green;
+        }
+        .hero-text p {
+            color: gray;
+        }
+        .cta {
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .cta:hover {
+            background-color: darkgreen;
+        }
+        .features {
+            padding: 40px;
+            background-color: #fff;
+        }
+        .feature {
+            display: inline-block;
+            width: 22%;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+        .feature h2 {
+            color: green;
+        }
+        .footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: white;
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 12px;
+            text-align: right;
+            position: relative;
+            bottom: 0;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <strong>PickNPack</strong>
+        <div>
+            <a href="login.html">Login</a>
+            <a href="signup.html">Sign Up</a>
+            <a href="dashboard.html">Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-text">
+            <h1>Fresh Groceries Delivered to Your Door</h1>
+            <p>Shop for fresh fruits, vegetables, and groceries at the best prices.</p>
+            <a href="productlist.html" class="cta">Start Shopping</a>
+        </div>
+        <div>
+            <img src="loginimage.png" alt="Grocery Illustration" width="400">
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features">
+        <h1>Why Choose PickNPack?</h1>
+        <div class="feature">
+            <h2>Easy Shopping</h2>
+            <p>Browse and add products to your cart with ease.</p>
+            <a href="productlist.html" class="cta">View Products</a>
+        </div>
+        <div class="feature">
+            <h2>Cart Management</h2>
+            <p>Manage your cart before checkout.</p>
+            <a href="cart.html" class="cta">View Cart</a>
+        </div>
+        <div class="feature">
+            <h2>Order History</h2>
+            <p>Track past and ongoing orders anytime.</p>
+            <a href="orders.html" class="cta">View Orders</a>
+        </div>
+        <div class="feature">
+            <h2>Secure Login</h2>
+            <p>Safe and fast login experience.</p>
+            <a href="login.html" class="cta">Login Now</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Made by Kusharga Agarwal</p>
+    </div>
+
+</body>
+</html>

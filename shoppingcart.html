@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | PickNPack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .checkout {
+            padding: 10px;
+            background: green;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Your Shopping Cart</h1>
+        <table id="cart-table">
+            <tr><th>Item</th><th>Quantity</th><th>Price</th></tr>
+        </table>
+        
+        <script>
+        fetch("fetch_cart.php")
+            .then(response => response.json())
+            .then(data => {
+                let cartTable = document.getElementById("cart-table");
+                data.forEach(item => {
+                    cartTable.innerHTML += `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${item.price * item.quantity}</td>
+                        </tr>`;
+                });
+            });
+        </script>
+        
+        <form onsubmit="placeOrder(event)">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <button type="submit">Checkout</button>
+        </form>
+        
+        <script>
+        function placeOrder(event) {
+            event.preventDefault();
+            let formData = new FormData(event.target);
+        
+            fetch("checkout.php", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+              .then(data => alert(data.message));
+        }
+        </script>
+        
+    </div>
+
+</body>
+</html>
