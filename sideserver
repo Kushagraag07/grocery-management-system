@@ -1,0 +1,216 @@
+<?php
+// save_order.php - For saving orders to the database
+
+// Connect to database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "picknpack";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get POST data
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Validate required fields
+if (empty($data['name']) || empty($data['email']) || empty($data['address']) || empty($data['phone'])) {
+    echo json_encode(['error' => 'Missing required fields']);
+    exit;
+}
+
+// Generate order ID
+$orderId = 'ORD-' . time();
+
+// Begin transaction
+$conn->begin_transaction();
+
+try {
+    // Insert order header
+    $stmt = $conn->prepare("INSERT INTO orders (order_id, user_name, user_email, address, phone, total_price, status, order_date) 
+                           VALUES (?, ?, ?, ?, ?, ?, 'Processing', NOW())");
+    
+    $stmt->bind_param("sssssd", 
+        $orderId, 
+        $data['name'], 
+        $data['email'], 
+        $data['address'], 
+        $data['phone'], 
+        $data['total_price']
+    );
+    
+    $stmt->execute();
+    
+    // Insert order items
+    $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, price, quantity) 
+                           VALUES (?, ?, ?, ?, ?)");
+    
+    foreach ($data['items'] as $item) {
+        $stmt->bind_param("sisdi", 
+            $orderId,
+            $item['id'],
+            $item['name'],
+            $item['price'],
+            $item['quantity']
+        );
+        
+        $stmt->execute();
+    }
+    
+    // Commit transaction
+    $conn->commit();
+    
+    echo json_encode(['success' => true, 'order_id' => $orderId]);
+    
+} catch (Exception $e) {
+    // Rollback transaction on error
+    $conn->rollback();
+    echo json_encode(['error' => 'Transaction failed: ' . $e->getMessage()]);
+}
+
+$conn->close();
+?>
+
+<?php
+// fetch_orders.php - For retrieving orders for the management page
+
+// Connect to database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "picknpack";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get orders with basic information
+$sql = "SELECT order_id, user_name, user_email, total_price, status, order_date 
+        FROM orders 
+        ORDER BY order_date DESC";
+        
+$result = $conn->query($sql);
+
+$orders = [];
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $orders[] = $row;
+    }
+}
+
+// Return orders as JSON
+echo json_encode($orders);
+
+$conn->close();
+?>
+
+<?php
+// fetch_order_details.php - For retrieving details of a specific order
+
+// Connect to database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "picknpack";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get order ID from request
+$orderId = $_GET['order_id'] ?? '';
+
+if (empty($orderId)) {
+    echo json_encode(['error' => 'Order ID is required']);
+    exit;
+}
+
+// Get order header
+$stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ?");
+$stmt->bind_param("s", $orderId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    echo json_encode(['error' => 'Order not found']);
+    exit;
+}
+
+$order = $result->fetch_assoc();
+
+// Get order items
+$stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
+$stmt->bind_param("s", $orderId);
+$stmt->execute();
+$itemsResult = $stmt->get_result();
+
+$items = [];
+while ($item = $itemsResult->fetch_assoc()) {
+    $items[] = $item;
+}
+
+// Add items to order
+$order['items'] = $items;
+
+// Return order details as JSON
+echo json_encode($order);
+
+$conn->close();
+?>
+
+<?php
+// update_order_status.php - For updating order status
+
+// Connect to database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "picknpack";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get POST data
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Validate required fields
+if (empty($data['order_id']) || empty($data['status'])) {
+    echo json_encode(['error' => 'Order ID and status are required']);
+    exit;
+}
+
+// Validate status
+$validStatuses = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+if (!in_array($data['status'], $validStatuses)) {
+    echo json_encode(['error' => 'Invalid status']);
+    exit;
+}
+
+// Update order status
+$stmt = $conn->prepare("UPDATE orders SET status = ? WHERE order_id = ?");
+$stmt->bind_param("ss", $data['status'], $data['order_id']);
+$stmt->execute();
+
+if ($stmt->affected_rows > 0) {
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['error' => 'Order not found or status not changed']);
+}
+
+$conn->close();
+?>

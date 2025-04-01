@@ -9,49 +9,313 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         .container {
             width: 80%;
             margin: auto;
             padding: 20px;
         }
+        .nav-bar {
+            background: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            background: #4CAF50;
+            border-radius: 4px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .order-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            display: none;
+        }
+        .order-details h2 {
+            color: #4CAF50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .customer-info {
+            margin-bottom: 20px;
+        }
+        .customer-info p {
+            margin: 5px 0;
+        }
+        .view-details-button {
+            padding: 5px 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .update-status-button {
+            padding: 5px 10px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .status-processing {
+            background-color: #FFC107;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #333;
+        }
+        .status-shipped {
+            background-color: #2196F3;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+        }
+        .status-delivered {
+            background-color: #4CAF50;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+        }
+        .status-cancelled {
+            background-color: #F44336;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+        }
+        .empty-orders {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Order History</h1>
-        <table id="order-table">
-            <tr><th>Order ID</th><th>Name</th><th>Email</th><th>Total Price</th><th>Status</th></tr>
-        </table>
-        
-        <script>
-        fetch("fetch_orders.php")
-            .then(response => response.json())
-            .then(data => {
-                let orderTable = document.getElementById("order-table");
-                data.forEach(order => {
-                    orderTable.innerHTML += `
-                        <tr>
-                            <td>${order.order_id}</td>
-                            <td>${order.user_name}</td>
-                            <td>${order.user_email}</td>
-                            <td>$${order.total_price}</td>
-                            <td>${order.status}</td>
-                        </tr>`;
-                });
-            });
-        </script>
-        
+    <div class="nav-bar">
+        <a href="productlist.html" class="nav-link">Products</a>
+        <a href="shoppingcart.html" class="nav-link">Shopping Cart</a>
     </div>
 
+    <div class="container">
+        <h1>Order Management</h1>
+        
+        <div id="orders-container">
+            <!-- Orders will be loaded here -->
+        </div>
+        
+        <div id="order-details" class="order-details">
+            <!-- Order details will be shown here -->
+        </div>
+    </div>
+
+    <script>
+        // Load orders from localStorage (in a real app, this would come from a server)
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const ordersContainer = document.getElementById('orders-container');
+            
+            if (orders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="empty-orders">
+                        <h2>No orders found</h2>
+                        <p>There are no orders in the system yet.</p>
+                    </div>`;
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            // Sort orders by date (newest first)
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            orders.forEach(order => {
+                const orderDate = new Date(order.date).toLocaleDateString();
+                const statusClass = `status-${order.status.toLowerCase()}`;
+                
+                html += `
+                    <tr>
+                        <td>${order.order_id}</td>
+                        <td>${order.user_name}</td>
+                        <td>${order.user_email}</td>
+                        <td>$${order.total_price.toFixed(2)}</td>
+                        <td>${orderDate}</td>
+                        <td><span class="${statusClass}">${order.status}</span></td>
+                        <td>
+                            <button class="view-details-button" onclick="viewOrderDetails('${order.order_id}')">View Details</button>
+                            <button class="update-status-button" onclick="showUpdateStatus('${order.order_id}')">Update Status</button>
+                        </td>
+                    </tr>`;
+            });
+            
+            html += `
+                    </tbody>
+                </table>`;
+            
+            ordersContainer.innerHTML = html;
+        }
+        
+        // View order details
+        function viewOrderDetails(orderId) {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const order = orders.find(o => o.order_id === orderId);
+            
+            if (!order) return;
+            
+            const orderDetailsContainer = document.getElementById('order-details');
+            const orderDate = new Date(order.date).toLocaleString();
+            
+            let itemsHtml = '';
+            let totalItems = 0;
+            
+            order.items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                totalItems += item.quantity;
+                
+                itemsHtml += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${itemTotal.toFixed(2)}</td>
+                    </tr>`;
+            });
+            
+            const statusClass = `status-${order.status.toLowerCase()}`;
+            
+            let html = `
+                <h2>Order Details - ${order.order_id}</h2>
+                <div class="customer-info">
+                    <p><strong>Customer:</strong> ${order.user_name}</p>
+                    <p><strong>Email:</strong> ${order.user_email}</p>
+                    <p><strong>Address:</strong> ${order.address}</p>
+                    <p><strong>Phone:</strong> ${order.phone}</p>
+                    <p><strong>Order Date:</strong> ${orderDate}</p>
+                    <p><strong>Status:</strong> <span class="${statusClass}">${order.status}</span></p>
+                </div>
+                
+                <h3>Order Items (${totalItems} items)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align: right;"><strong>Order Total:</strong></td>
+                            <td><strong>$${order.total_price.toFixed(2)}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <button onclick="hideOrderDetails()" style="margin-top: 20px;" class="view-details-button">Close Details</button>
+            `;
+            
+            orderDetailsContainer.innerHTML = html;
+            orderDetailsContainer.style.display = 'block';
+            orderDetailsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Hide order details
+        function hideOrderDetails() {
+            document.getElementById('order-details').style.display = 'none';
+        }
+        
+        // Show update status dialog
+        function showUpdateStatus(orderId) {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const order = orders.find(o => o.order_id === orderId);
+            
+            if (!order) return;
+            
+            const newStatus = prompt(`Update status for order ${orderId}\nCurrent status: ${order.status}\n\nEnter new status (Processing, Shipped, Delivered, Cancelled):`);
+            
+            if (newStatus && ['Processing', 'Shipped', 'Delivered', 'Cancelled'].includes(newStatus)) {
+                updateOrderStatus(orderId, newStatus);
+            } else if (newStatus) {
+                alert('Invalid status. Please use Processing, Shipped, Delivered, or Cancelled.');
+            }
+        }
+        
+        // Update order status
+        function updateOrderStatus(orderId, newStatus) {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const orderIndex = orders.findIndex(o => o.order_id === orderId);
+            
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = newStatus;
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                // Reload orders and details if open
+                loadOrders();
+                if (document.getElementById('order-details').style.display === 'block') {
+                    viewOrderDetails(orderId);
+                }
+                
+                alert(`Order ${orderId} status updated to ${newStatus}`);
+            }
+        }
+        
+        // Load orders when page loads
+        window.onload = loadOrders;
+        
+        // In a real application, you would use fetch to get orders from the server
+        // function fetchOrders() {
+        //     fetch('fetch_orders.php')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             // Save to localStorage for demo purposes
+        //             localStorage.setItem('orders', JSON.stringify(data));
+        //             loadOrders();
+        //         });
+        // }
+    </script>
 </body>
 </html>

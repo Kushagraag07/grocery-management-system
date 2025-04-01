@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         .container {
             width: 80%;
@@ -18,65 +19,333 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .cart-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+            padding: 10px 0;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .checkout-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-        .checkout {
-            padding: 10px;
-            background: green;
+        .checkout-button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .checkout-button:hover {
+            background: #45a049;
+        }
+        .quantity-button {
+            padding: 3px 8px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .remove-button {
+            padding: 5px 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .nav-bar {
+            background: #333;
+            padding: 15px;
+        }
+        .continue-shopping {
             color: white;
             text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            background: #4CAF50;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <div class="nav-bar">
+        <a href="productlist.html" class="continue-shopping">← Continue Shopping</a>
+    </div>
 
     <div class="container">
         <h1>Your Shopping Cart</h1>
-        <table id="cart-table">
-            <tr><th>Item</th><th>Quantity</th><th>Price</th></tr>
-        </table>
         
-        <script>
-        fetch("fetch_cart.php")
-            .then(response => response.json())
-            .then(data => {
-                let cartTable = document.getElementById("cart-table");
-                data.forEach(item => {
-                    cartTable.innerHTML += `
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.quantity}</td>
-                            <td>$${item.price * item.quantity}</td>
-                        </tr>`;
-                });
-            });
-        </script>
+        <div id="cart-content">
+            <!-- Cart will be loaded here -->
+        </div>
         
-        <form onsubmit="placeOrder(event)">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Your Email" required>
-            <button type="submit">Checkout</button>
-        </form>
-        
-        <script>
-        function placeOrder(event) {
-            event.preventDefault();
-            let formData = new FormData(event.target);
-        
-            fetch("checkout.php", {
-                method: "POST",
-                body: formData
-            }).then(response => response.json())
-              .then(data => alert(data.message));
-        }
-        </script>
-        
+        <div id="checkout-form" style="display: none;">
+            <form id="order-form" class="checkout-form">
+                <h2>Complete Your Order</h2>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <button type="submit" class="checkout-button">Place Order</button>
+            </form>
+        </div>
     </div>
 
+    <script>
+        // Load cart from localStorage
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartContent = document.getElementById('cart-content');
+            
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="empty-cart">
+                        <h2>Your cart is empty</h2>
+                        <p>Go back to the product page to add items to your cart.</p>
+                    </div>`;
+                return;
+            }
+            
+            // Group items by category
+            const fruits = cart.filter(item => item.category === 'fruit');
+            const vegetables = cart.filter(item => item.category === 'vegetable');
+            
+            let html = '';
+            let totalAmount = 0;
+            
+            // Create tables for each category if they have items
+            if (fruits.length > 0) {
+                html += createCategoryTable('Fruits', fruits);
+                totalAmount += calculateCategoryTotal(fruits);
+            }
+            
+            if (vegetables.length > 0) {
+                html += createCategoryTable('Vegetables', vegetables);
+                totalAmount += calculateCategoryTotal(vegetables);
+            }
+            
+            // Add cart summary and total
+            html += `
+                <div class="cart-summary">
+                    <div class="total">Total: $${totalAmount.toFixed(2)}</div>
+                    <button onclick="showCheckoutForm()" class="checkout-button">Proceed to Checkout</button>
+                </div>`;
+            
+            cartContent.innerHTML = html;
+        }
+        
+        // Create table for each category
+        function createCategoryTable(categoryName, items) {
+            let html = `
+                <h2>${categoryName}</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>
+                            <button class="quantity-button" onclick="updateQuantity(${item.id}, -1)">-</button>
+                            ${item.quantity}
+                            <button class="quantity-button" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </td>
+                        <td>$${itemTotal.toFixed(2)}</td>
+                        <td><button class="remove-button" onclick="removeItem(${item.id})">Remove</button></td>
+                    </tr>`;
+            });
+            
+            html += `
+                    </tbody>
+                </table>`;
+            
+            return html;
+        }
+        
+        // Calculate total for a category
+        function calculateCategoryTotal(items) {
+            return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        }
+        
+        // Update item quantity
+        function updateQuantity(id, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === id);
+            
+            if (itemIndex !== -1) {
+                cart[itemIndex].quantity += change;
+                
+                // Remove item if quantity is 0 or less
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+        
+        // Remove item from cart
+        function removeItem(id) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const updatedCart = cart.filter(item => item.id !== id);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+            loadCart();
+        }
+        
+        // Calculate cart total
+        function calculateCartTotal() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        }
+        
+        // Show checkout form
+        function showCheckoutForm() {
+            document.getElementById('checkout-form').style.display = 'block';
+            document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Save order to localStorage
+        function saveOrder(orderData) {
+            // Get existing orders or create new array
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            
+            // Generate a unique order ID
+            const orderId = 'ORD-' + Date.now();
+            
+            // Create new order object
+            const newOrder = {
+                order_id: orderId,
+                user_name: orderData.name,
+                user_email: orderData.email,
+                address: orderData.address,
+                phone: orderData.phone,
+                total_price: calculateCartTotal(),
+                items: JSON.parse(localStorage.getItem('cart')) || [],
+                status: 'Processing',
+                date: new Date().toISOString()
+            };
+            
+            // Add new order to orders array
+            orders.push(newOrder);
+            
+            // Save updated orders back to localStorage
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            return orderId;
+        }
+        
+        // In a real application, this would send the data to the server
+        function submitOrder(orderData) {
+            // For a real application, you'd use fetch to send data to server
+            // fetch('save_order.php', {
+            //     method: 'POST',
+            //     body: JSON.stringify(orderData)
+            // })
+            
+            // Save order to localStorage (for demo purposes)
+            const orderId = saveOrder(orderData);
+            
+            alert(`Order #${orderId} placed successfully! Thank you for shopping with us.`);
+            
+            // Clear cart after successful order
+            localStorage.removeItem('cart');
+            
+            // Redirect to order confirmation or product list
+            window.location.href = 'ordermanagement.html';
+        }
+        
+        // Handle form submission
+        document.getElementById('order-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value
+            };
+            
+            // Submit order
+            submitOrder(formData);
+        });
+        
+        // Load cart when page loads
+        window.onload = loadCart;
+    </script>
 </body>
 </html>

@@ -9,72 +9,212 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         .container {
             width: 80%;
             margin: auto;
             padding: 20px;
         }
+        .category {
+            margin-bottom: 30px;
+        }
+        .category-title {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
         .product {
-            display: inline-block;
-            width: 30%;
+            width: 200px;
+            height: 300px;
             margin: 15px;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             text-align: center;
             background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .product img {
             width: 150px;
             height: 150px;
             border-radius: 5px;
+            object-fit: cover;
+            margin: 0 auto;
         }
-        .button {
-            padding: 10px;
-            background: green;
+        .product-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .product h3 {
+            margin: 10px 0;
+            color: #333;
+            height: 25px; /* Fixed height for title */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .price {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        .add-button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        .add-button:hover {
+            background: #45a049;
+        }
+        .cart-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+        }
+        .nav-bar {
+            background: #333;
+            padding: 15px;
+            text-align: right;
+        }
+        .cart-icon {
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            display: block;
-            margin-top: 10px;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            background: #4CAF50;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Available Products</h1>
-        <div id="product-list"></div>
+    <div class="nav-bar">
+        <a href="shoppingcart.html" class="cart-icon">🛒 View Cart</a>
     </div>
 
-    <script>
-        fetch("fetch_products.php")
-            .then(response => product.json())
-            .then(data => {
-                let productList = document.getElementById("product-list");
-                data.forEach(product => {
-                    productList.innerHTML += `
-                        <div class="product">
-                            <img src="${product.image_url}" alt="${product.name}">
-                            <h2>${product.name}</h2>
-                            <p>Price: $${product.price}</p>
-                            <button onclick="addToCart(${product.id})">Add to Cart</button>
-                        </div>`;
-                });
-            });
-        </script>
-    <script>
-        function addToCart(productId) {
-            fetch("add_to_cart.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `product_id=${productId}`
-            }).then(response => product.json())
-              .then(data => alert(data.message));
-        }
-        </script>
-          
+    <div class="container">
+        <h1>Fresh Produce</h1>
+        
+        <div class="category">
+            <h2 class="category-title">Fruits</h2>
+            <div class="product-container" id="fruits-container">
+                <!-- Fruits will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2 class="category-title">Vegetables</h2>
+            <div class="product-container" id="vegetables-container">
+                <!-- Vegetables will be loaded here -->
+            </div>
+        </div>
+    </div>
 
+    <div class="cart-notification" id="notification">Item added to cart!</div>
+
+    <script>
+        // Product data
+        const products = {
+            fruits: [
+                {id: 1, name: "Apple", price: 100, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Fruits\FreshApple\freshApple(180).jpg", category: "fruit"},
+                {id: 2, name: "Banana", price: 50, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Fruits\FreshBanana\freshBanana(4).jpg", category: "fruit"},
+                {id: 3, name: "Strawberry", price: 120, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Fruits\FreshStrawberry\freshStrawberry (38).jpg", category: "fruit"}
+            ],
+            vegetables: [
+                {id: 4, name: "Carrot", price: 80, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Vegetables\FreshCarrot\freshCarrot (1).jpg", category: "vegetable"},
+                {id: 5, name: "Cucumber", price: 90, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Vegetables\FreshCucumber\freshCucumber (286).jpg", category: "vegetable"},
+                {id: 6, name: "Potato", price: 50, image_url: "D:\volume E\srm\SEPM\PickNPack\Fruits_Vegetables_Dataset(12000)\Vegetables\FreshPotato\freshPotato (38).jpg", category: "vegetable"}
+            ]
+        };
+
+        // Display fruits
+        const fruitsContainer = document.getElementById("fruits-container");
+        products.fruits.forEach(product => {
+            fruitsContainer.innerHTML += `
+                <div class="product">
+                    <img src="${product.image_url}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="price">Rs${product.price.toFixed(2)}</p>
+                    </div>
+                    <button class="add-button" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.category}')">Add to Cart</button>
+                </div>`;
+        });
+
+        // Display vegetables
+        const vegetablesContainer = document.getElementById("vegetables-container");
+        products.vegetables.forEach(product => {
+            vegetablesContainer.innerHTML += `
+                <div class="product">
+                    <img src="${product.image_url}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="price">Rs${product.price.toFixed(2)}</p>
+                    </div>
+                    <button class="add-button" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.category}')">Add to Cart</button>
+                </div>`;
+        });
+
+        // Function to add items to cart
+        function addToCart(id, name, price, category) {
+            // Get existing cart or initialize empty array
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            // Check if product already exists in cart
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                // Increment quantity if item exists
+                existingItem.quantity += 1;
+            } else {
+                // Add new item if it doesn't exist
+                cart.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    quantity: 1,
+                    category: category
+                });
+            }
+            
+            // Save updated cart back to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Show notification
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
