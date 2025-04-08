@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
         }
         .navbar {
             display: flex;
@@ -29,48 +29,338 @@
             color: green;
         }
         .container {
-            text-align: center;
-            padding: 50px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .dashboard-buttons {
-            display: flex;
-            justify-content: center;
+        .welcome-banner {
+            background-color: #f0f8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid green;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
             gap: 20px;
         }
-        .button {
-            padding: 15px 25px;
+        .sidebar {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: #e0f0e0;
+            color: green;
+        }
+        .main-content {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .order-items {
+            margin-top: 10px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 15px;
             background-color: green;
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
         }
-        .button:hover {
+        .btn:hover {
             background-color: darkgreen;
         }
     </style>
 </head>
 <body>
-
+    <!-- Navbar -->
     <div class="navbar">
         <strong>PickNPack</strong>
         <div>
-            <a href="products.html">Products</a>
-            <a href="cart.html">Cart</a>
-            <a href="orders.html">Orders</a>
-            <a href="login.html" style="color: green;">Logout</a>
+            <a href="productlist.html">Products</a>
+            <a href="shoppingcart.html">Cart</a>
+            <a href="dashboard.html" class="active">My Account</a>
+            <a href="logout.php">Logout</a>
         </div>
     </div>
 
     <div class="container">
-        <h1>Welcome to Your Dashboard</h1>
-        <p>Manage your shopping experience efficiently.</p>
-        <div class="dashboard-buttons">
-            <a href="products.html" class="button">Browse Products</a>
-            <a href="cart.html" class="button">View Cart</a>
-            <a href="orders.html" class="button">Order History</a>
+        <div class="welcome-banner">
+            <h2>Welcome <span id="user-name">User</span>!</h2>
+            <p>Manage your account and orders from your dashboard.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ul>
+                    <li><a href="#" class="tab-link active" data-tab="profile">My Profile</a></li>
+                    <li><a href="#" class="tab-link" data-tab="orders">Order History</a></li>
+                    <li><a href="#" class="tab-link" data-tab="address">Address Book</a></li>
+                    <li><a href="#" class="tab-link" data-tab="settings">Account Settings</a></li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Profile Tab -->
+                <div id="profile" class="tab-content active">
+                    <h2>My Profile</h2>
+                    <form id="profile-form" action="update_profile.php" method="POST">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <button type="submit" class="btn">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Orders Tab -->
+                <div id="orders" class="tab-content">
+                    <h2>Order History</h2>
+                    <div id="orders-container">
+                        <!-- Orders will be loaded here -->
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <strong>Order #12345</strong>
+                                    <p>Placed on: April 5, 2025</p>
+                                </div>
+                                <div>
+                                    <span class="status">Delivered</span>
+                                    <p>Total: $45.99</p>
+                                </div>
+                            </div>
+                            <div class="order-items">
+                                <div class="order-item">
+                                    <span>Apples (2kg)</span>
+                                    <span>$5.99</span>
+                                </div>
+                                <div class="order-item">
+                                    <span>Milk (1 gallon)</span>
+                                    <span>$3.99</span>
+                                </div>
+                                <div class="order-item">
+                                    <span>Bread (2 loaves)</span>
+                                    <span>$6.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Tab -->
+                <div id="address" class="tab-content">
+                    <h2>Address Book</h2>
+                    <form id="address-form" action="update_address.php" method="POST">
+                        <div class="form-group">
+                            <label for="address">Street Address</label>
+                            <input type="text" id="address" name="address">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state">
+                        </div>
+                        <div class="form-group">
+                            <label for="postal_code">Postal Code</label>
+                            <input type="text" id="postal_code" name="postal_code">
+                        </div>
+                        <button type="submit" class="btn">Update Address</button>
+                    </form>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content">
+                    <h2>Account Settings</h2>
+                    <form id="password-form" action="update_password.php" method="POST">
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <input type="password" id="new_password" name="new_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn">Change Password</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch user data
+            fetch('get_user_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.loggedin) {
+                        document.getElementById('user-name').textContent = data.name;
+                        document.getElementById('name').value = data.name;
+                        document.getElementById('email').value = data.email;
+                        if (data.phone) document.getElementById('phone').value = data.phone;
+                        if (data.address) document.getElementById('address').value = data.address;
+                        if (data.city) document.getElementById('city').value = data.city;
+                        if (data.state) document.getElementById('state').value = data.state;
+                        if (data.postal_code) document.getElementById('postal_code').value = data.postal_code;
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    window.location.href = 'login.html';
+                });
+
+            // Load order history
+            fetch('get_orders.php')
+                .then(response => response.json())
+                .then(data => {
+                    const ordersContainer = document.getElementById('orders-container');
+                    ordersContainer.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        ordersContainer.innerHTML = '<p>You have no orders yet.</p>';
+                        return;
+                    }
+                    
+                    data.forEach(order => {
+                        let orderHTML = `
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div>
+                                        <strong>Order #${order.id}</strong>
+                                        <p>Placed on: ${order.created_at}</p>
+                                    </div>
+                                    <div>
+                                        <span class="status">${order.status}</span>
+                                        <p>Total: $${order.total_amount}</p>
+                                    </div>
+                                </div>
+                                <div class="order-items">
+                        `;
+                        
+                        order.items.forEach(item => {
+                            orderHTML += `
+                                <div class="order-item">
+                                    <span>${item.name} (${item.quantity})</span>
+                                    <span>$${item.price}</span>
+                                </div>
+                            `;
+                        });
+                        
+                        orderHTML += `
+                                </div>
+                            </div>
+                        `;
+                        
+                        ordersContainer.innerHTML += orderHTML;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading orders:', error);
+                    document.getElementById('orders-container').innerHTML = '<p>Error loading order history.</p>';
+                });
+            
+            // Tab navigation
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and links
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    tabLinks.forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

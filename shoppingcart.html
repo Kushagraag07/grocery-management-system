@@ -189,7 +189,7 @@
             // Add cart summary and total
             html += `
                 <div class="cart-summary">
-                    <div class="total">Total: $${totalAmount.toFixed(2)}</div>
+                    <div class="total">Total: Rs${totalAmount.toFixed(2)}</div>
                     <button onclick="showCheckoutForm()" class="checkout-button">Proceed to Checkout</button>
                 </div>`;
             
@@ -217,7 +217,7 @@
                 html += `
                     <tr>
                         <td>${item.name}</td>
-                        <td>$${item.price.toFixed(2)}</td>
+                        <td>Rs${item.price.toFixed(2)}</td>
                         <td>
                             <button class="quantity-button" onclick="updateQuantity(${item.id}, -1)">-</button>
                             ${item.quantity}
